@@ -1,0 +1,107 @@
+Department	Task	Hourly Cost	FTE Hours	Review Rate	Review Hours
+Medical	Concept Note Writing	950	16	3000	5
+Medical	Literature Review/Search (Can vary based on Scope and extent of data)	950	24	3000	4
+Medical	Protocol Writing -Post Marketing/RWE	950	70	3000	18
+Medical	Protocol Writing -Phase 4	950	70	3000	18
+Medical	ICD (n=1; English)	950	18	3000	4
+Medical	ICD + Ascent (n=1; English)	950	19	3000	4.25
+Medical	Data variable enlisting for DCF/CRF preparation	950	6	3000	1
+Medical	Site Feasibility Questionnaire (Post Concept Finalization)	950	3.5	3000	1
+Medical	Feasibility Questionnaire (e.g. Study Feasibility/Survey)	950	3.5	3000	2
+Medical	Investigator meeting deck	950	7	3000	4
+Medical	Protocol Training Deck	950	12	3000	3
+Medical	SAP - Dummy tables (overlaps with stats)	950	12	3000	4
+Medical	SAR (overlaps with stats) (review, varies as per study depth)	950	NA	3000	24
+Medical	Statistical Analysis (Varies based on quantum and variables) (review)	950	NA	3000	16
+Medical	Slide Deck (25 slides; Can vary based on Objective; includes RFP deck, interim report etc.)	950	28	3000	8
+Medical	CSR	950	28	3000	28
+Medical	Journal Selection and list development	950	8	3000	1.5
+Medical	MS writing (Original article for clinical studies)	950	80	3000	24
+Medical	MS writing - Review article (Narrative/SLR) (including literature search and finalization)	950	80	3000	35
+Medical	Abstract for Conference (1st draft for Client's review and approval)	950	110	3000	5
+Medical	Poster in ppt format (1st draft for Client's review and approval)	950	16	3000	10
+Medical	Submission package preparation and journal submission (varies as per journal requirement)	950	35	3000	1
+Medical	Minor Revisions of Submitted Manuscript and Re-submission (Reviewer comments post submission)	950	12	3000	4
+Medical	Major Revisions of Submitted Manuscript and Re-submission (Reviewer comments post submission)	950	40	3000	12
+Medical	Other Activities (Grant writing, RFP documents)	950	40	3000	12
+SSU	Site Identification (per site)	800	0.5	3000	0
+SSU	Pre-feasibility form development	800	4	3000	0
+SSU	Pre-feasibility	800	1.5	3000	0
+SSU	Feasibility	800	1.5	3000	1
+SSU	Feasibility Report	800	4	3000	0
+SSU	Essential document collection	800	2	3000	0
+SSU	PSQV - preparation	800	4	3000	0
+SSU	PSQV - visit & report	800	8	3000	0
+SSU	PSQV - local travel	800	5	3000	0
+SSU	PSQV - Out-station travel	800	10	3000	0
+SSU	CSA/MoU development	800	8.5	3000	0.5
+SSU	CSA/MoU negotiation	800	2	3000	0
+SSU	EC Dossier preparation	800	4	3000	0
+SSU	EC Dossier online submission	800	2	3000	0
+SSU	EC Dossier offline submission	800	8	3000	0
+SSU	EC Communication	800	4	3000	0
+SSU	Finance & Admin - A/C setup	800	2	3000	0
+SSU	SIV Dossier Printing & Dispatch	800	8	3000	0
+SSU	Site Handover	800	4	3000	0
+SSU	TMF Support	800	12	3000	0
+SSU	ISF Support	800	16	3000	0
+SSU	eISF support	800		3000	0
+DM	Protocol Training	850	25	3000	0
+DM	DMP development and finalization	850	50	3000	2
+DM	CRF Development (upto 50 pages)	850	120	3000	0
+DM	CRF Finalization	850	50	3000	1
+DM	DCF development (on paper CRF)	850	40	3000	0
+DM	DCF development (no paper CRF)	850	80	3000	0
+DM	EDC finalization	850	50	3000	0
+DM	EDC UAT- Demo	850	80	3000	0
+DM	EDC UAT- Production	850	5	3000	1
+DM	Data Digitization	850	1	3000	0
+DM	Trackers update	850	1.5	3000	10
+DM	EDC completion guidelines	850	60	3000	1
+DM	Patient Diary (if required)	850	30	3000	0
+DM	Patient dairy completion guidelines	850	20	3000	0
+DM	Prospective study	850		3000	0
+DM	Data QC (per visit) [Prospective]	850	2	3000	0
+DM	Query generation (per visit) [Prospective]	850	0.5	3000	0
+DM	Query resolution (per visit) [Prospective]	850	0.5	3000	0
+DM	Final data harmonization [Prospective]	850	6.5	3000	0
+DM	Retrospective study	850		3000	0
+DM	Data QC (per visit) [Retrospective]	850	2	3000	0
+DM	Query generation (per visit) [Retrospective]	850	1	3000	0
+DM	Query resolution (per visit) [Retrospective]	850	1	3000	0
+DM	Final data harmonization [Retrospective]	850	6.5	3000	0
+PM	Protocol Training	1350	4	3000	1
+PM	Project Plan Development	1350	40	3000	1
+PM	PMP Development	1350	40	3000	0
+PM	Study Plans	1350	80	3000	0
+PM	KO preparation & meeting	1350	4	3000	0
+PM	TMF Management (per site)	1350	40	3000	0
+PM	Liasioning with Interdepartments on Client Review and Finalization, Data Analysis, Report Finalization, Tech Team Guidance on CRF Deployment, Quality Management and Compliance	1350	100	3000	0
+PM	Study Progress Calls (Daily Progress Update and Tracking, PPT, MoM and Internal Update Calls) per site per month	1350	4	3000	0
+PM	Client calls weekly	1350	2	3000	20
+PM	Vendor Management (per month per vendor)	1350	8	3000	0
+PM	Project Close-out	1350	80	3000	0
+SM	Daily follow-up	1100	0.25	3000	0
+SM	Documentation	1100	0.25	3000	0
+SM	EDC verification	1100	10	3000	0
+SM	Query resolutions	1100	8	3000	0
+SM	Site re-training	1100	4	3000	0
+SM	SIV preparation	1100	20	3000	0
+SM	SIV	1100	16	3000	0
+SM	SMV preparation	1100	8	3000	0
+SM	SMV	1100	16	3000	0
+SM	SCV Preparation	1100	16	3000	0
+SM	SCV	1100	16	3000	0
+SM	Local travel for visits	1100	5	3000	0
+SM	Out-station travel for visits	1100	14	3000	0
+EC	Registration	1200	10	3000	0
+EC	CTRI submission	1200	10	3000	0
+EC	CTRI query resolution	1200	5	3000	0
+EC	Client Communications	1200	5	3000	0
+EC	Coordination with PM	1200	10	3000	0
+EC	CTRI Updates	1200	5	3000	0
+EC	Regulatory updates	1200	5	3000	0
+BioStats	SAP - Dummy tables	1200		3000	0
+BioStats	SAR	1200		3000	0
+BioStats	Analysis	1200		3000	0
+BioStats	Medical writing Liasion	1200		3000	0
