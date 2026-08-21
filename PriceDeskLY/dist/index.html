@@ -240,6 +240,7 @@ td.qty input.ovr,td.uc input.ovr,td.mg input.ovr{color:var(--s2);font-weight:600
 .scenbar .btn{padding:5px 11px;font-size:12px}
 .scenbar .sp{flex:1}
 .saved{font-size:11px;color:var(--ink-3)}
+.saved.ok{color:var(--good);font-weight:600}
 /* client quote document */
 .qdoc{background:var(--surface);border:1px solid var(--rule);border-radius:9px;box-shadow:var(--shadow);
   padding:30px 34px;max-width:920px}
@@ -386,6 +387,7 @@ img,svg{max-width:100%}
       <button class="btn pri" id="tplNew">Save current scope as template</button>
       <button class="btn" id="tplFolder">New folder</button>
       <span style="flex:1"></span>
+      <span class="saved" id="tplWhere">Stored in this browser only</span>
       <span class="saved" id="tplStatus">&nbsp;</span>
     </div>
     <div class="folders" id="tplFolders"></div>
@@ -856,7 +858,8 @@ $('#scenUpdate').addEventListener('click',()=>{
 $('#scenDelete').addEventListener('click',()=>{
   const n=$('#scenList').value; if(!n){status('Pick a saved scenario first');return;}
   if(!confirm('Delete scenario "'+n+'"?'))return;
-  const all=loadAll(); delete all[n]; saveAll(all); refreshList(''); status('Deleted "'+n+'"');});
+  const all=loadAll(); delete all[n]; saveAll(all); refreshList('');
+tplBoot(); status('Deleted "'+n+'"');});
 $('#scenList').addEventListener('change',e=>{
   const n=e.target.value; if(!n){status('');return;}
   restore(loadAll()[n]); status('Loaded "'+n+'"');});
@@ -1000,10 +1003,67 @@ const PRESETS={
   "Poster in ppt format (1st draft for Client's review and approval)",'Journal Fee']};
 /* ---------- templates & folders ---------- */
 const TPL_KEY='pricedeskly.templates.v2';
-const tplLoad=()=>{try{const d=JSON.parse(localStorage.getItem(TPL_KEY));
+/* Templates live server-side when a KV namespace is bound, and in this browser
+   otherwise. The cache is read synchronously so render() stays synchronous;
+   writes go to local storage immediately and to the server in the background. */
+let TPL_MODE='local', TPL_CACHE=null, TPL_SYNCED={folders:[],items:{}};
+function tplFromLocal(){try{const d=JSON.parse(localStorage.getItem(TPL_KEY));
   return d&&d.items?{folders:d.folders||[],items:d.items}:{folders:[],items:{}};}
-  catch(e){return{folders:[],items:{}};}};
-const tplSave=d=>localStorage.setItem(TPL_KEY,JSON.stringify(d));
+  catch(e){return{folders:[],items:{}};}}
+const tplLoad=()=>(TPL_CACHE||(TPL_CACHE=tplFromLocal()));
+function tplSave(d){
+  TPL_CACHE=d;
+  try{localStorage.setItem(TPL_KEY,JSON.stringify(d));}catch(e){}
+  tplPush(d);
+}
+const jreq=(url,method,body)=>fetch(url,{method,
+  headers:body!==undefined?{'Content-Type':'application/json'}:undefined,
+  body:body!==undefined?JSON.stringify(body):undefined});
+async function tplPush(d){
+  if(TPL_MODE!=='shared')return;
+  const jobs=[];
+  for(const [id,it] of Object.entries(d.items))
+    if(JSON.stringify(it)!==JSON.stringify(TPL_SYNCED.items[id]))
+      jobs.push(jreq('/api/templates/'+encodeURIComponent(id),'PUT',it));
+  for(const id of Object.keys(TPL_SYNCED.items))
+    if(!d.items[id]) jobs.push(jreq('/api/templates/'+encodeURIComponent(id),'DELETE'));
+  if(JSON.stringify(d.folders)!==JSON.stringify(TPL_SYNCED.folders))
+    jobs.push(jreq('/api/folders','PUT',d.folders));
+  if(!jobs.length)return;
+  try{
+    const rs=await Promise.all(jobs);
+    if(rs.some(r=>!r.ok))throw new Error('write rejected');
+    TPL_SYNCED=JSON.parse(JSON.stringify(d));
+    tplStatus('Saved for everyone');
+  }catch(e){ tplStatus('Saved on this device; could not reach shared storage'); }
+}
+function tplBadge(){
+  const el=$('#tplWhere'); if(!el)return;
+  el.textContent=TPL_MODE==='shared'?'Shared with everyone who has the password'
+                                    :'Stored in this browser only';
+  el.className='saved'+(TPL_MODE==='shared'?' ok':'');
+}
+async function tplBoot(){
+  try{
+    const r=await fetch('/api/templates',{headers:{Accept:'application/json'}});
+    if(!r.ok)throw new Error('unavailable');
+    const server=await r.json();
+    TPL_MODE='shared';
+    const local=tplFromLocal();
+    const serverEmpty=!Object.keys(server.items||{}).length;
+    const localCount=Object.keys(local.items||{}).length;
+    if(serverEmpty&&localCount){
+      TPL_CACHE=local; TPL_SYNCED={folders:[],items:{}};
+      await tplPush(local);
+      tplStatus(`Moved ${localCount} template${localCount===1?'':'s'} into shared storage`);
+    }else{
+      TPL_CACHE={folders:server.folders||[],items:server.items||{}};
+      TPL_SYNCED=JSON.parse(JSON.stringify(TPL_CACHE));
+      try{localStorage.setItem(TPL_KEY,JSON.stringify(TPL_CACHE));}catch(e){}
+    }
+  }catch(e){ TPL_MODE='local'; }
+  tplBadge(); renderTemplates();
+}
 const idsFor=names=>{const set=new Set(names);return TASKS.filter(t=>set.has(t.task)).map(t=>t.id);};
 const BUILTIN=()=>[
   {id:'bi-rwe',name:'RWE study',folder:'Built-in',builtin:true,sel:idsFor(PRESETS.rwe),fee:22.5},
@@ -1189,6 +1249,7 @@ syncTape();
 applyPreset('rwe');
 render();
 refreshList('');
+tplBoot();
 (function boot(){
   const h=location.hash.match(/^#s=(.+)$/);
   if(h){ try{ restore(JSON.parse(decodeURIComponent(escape(atob(h[1]))))); status('Loaded from link'); return; }
