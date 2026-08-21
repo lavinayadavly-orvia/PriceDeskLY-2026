@@ -266,6 +266,35 @@ table.qt tfoot tr.tot td{font-weight:700;font-size:14px;border-top:2px solid var
   .qmeta,.scenbar,.tape{display:none!important}
   .main{padding:0!important}
 }
+.tplbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:13px}
+.folders{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:15px;padding-bottom:13px;
+  border-bottom:1px solid var(--rule-2)}
+.fchip{padding:5px 12px;border:1px solid var(--rule);border-radius:14px;font-size:12px;
+  color:var(--ink-2);background:var(--surface);transition:.12s;display:inline-flex;align-items:center;gap:6px}
+.fchip:hover{border-color:var(--brand)}
+.fchip[aria-pressed=true]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.fchip .n{font-family:"IBM Plex Mono",monospace;font-size:9.5px;opacity:.75}
+.tplgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:12px}
+.tplcard{border:1px solid var(--rule);border-radius:9px;background:var(--surface);padding:14px 15px;
+  display:flex;flex-direction:column;gap:9px;transition:.12s;box-shadow:var(--shadow);text-align:left;
+  cursor:pointer;width:100%}
+.tplcard:hover{border-color:var(--brand);transform:translateY(-1px)}
+.tplcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.tplcard .nm{font-size:13.5px;font-weight:600;letter-spacing:-.01em;line-height:1.3}
+.tplcard .badge{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.06em;
+  text-transform:uppercase;padding:2px 7px;border-radius:9px;border:1px solid var(--rule);
+  color:var(--ink-3);white-space:nowrap;flex:none}
+.tplcard .badge.bi{border-color:var(--brand);color:var(--brand)}
+.tplcard .figs{display:flex;gap:14px;flex-wrap:wrap}
+.tplcard .fig{display:flex;flex-direction:column;gap:1px}
+.tplcard .fig .v{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;
+  font-variant-numeric:tabular-nums}
+.tplcard .acts{display:flex;gap:6px;margin-top:2px;flex-wrap:wrap}
+.tplcard .acts button{font-size:11px;padding:3px 9px;border:1px solid var(--rule);border-radius:5px;
+  color:var(--ink-2);background:var(--surface-2)}
+.tplcard .acts button:hover{border-color:var(--brand);color:var(--brand)}
+.tplcard .acts select{font-size:11px;padding:3px 6px;border:1px solid var(--rule);border-radius:5px;
+  background:var(--surface-2);color:var(--ink-2);max-width:118px}
 .empty{padding:34px 16px;text-align:center;color:var(--ink-3);font-size:13px}
 @media print{.rail,.tabs,.tapeact,.toolbar{display:none}.wrap{grid-template-columns:1fr}}
 </style>
@@ -331,18 +360,18 @@ img,svg{max-width:100%}
     <p style="font-size:11px;color:var(--ink-3);margin:9px 0 0;line-height:1.45">Margin is a share of the <strong>invoice</strong>, not a mark-up on cost, so the fixed fee is grossed up to hit it &mdash; 22.5% margin needs a 29.0% uplift, and the floor holds at 22.5%. Pass-through and tech bill at cost: no margin, no discount, and excluded from revenue.</p>
   </div>
   <div class="grp">
-    <span class="lbl">Presets</span>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <span class="lbl">Templates</span>
+    <div style="display:flex;gap:6px;flex-wrap:wrap" id="railTpl"></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
       <button class="chip" data-preset="clear">Clear all</button>
-      <button class="chip" data-preset="rwe">RWE study</button>
-      <button class="chip" data-preset="ph4">Phase 4</button>
-      <button class="chip" data-preset="pub">Publication only</button>
+      <button class="chip" id="railManage">Manage&hellip;</button>
     </div>
   </div>
 </aside>
 
 <main class="main">
   <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="false" data-pane="tpl">Templates<span class="cnt" id="cTpl">0</span></button>
     <button class="tab" role="tab" aria-selected="true" data-pane="scope">Scope<span class="cnt" id="cScope">0</span></button>
     <button class="tab" role="tab" aria-selected="false" data-pane="dash">Dashboard</button>
     <button class="tab" role="tab" aria-selected="false" data-pane="bridge">Price bridge</button>
@@ -350,6 +379,17 @@ img,svg{max-width:100%}
     <button class="tab" role="tab" aria-selected="false" data-pane="quote">Client quote</button>
     <button class="tab" role="tab" aria-selected="false" data-pane="audit">Audit<span class="cnt" id="cAudit">0</span></button>
   </div>
+
+  <section class="pane" id="pane-tpl" hidden>
+    <div class="tplbar">
+      <button class="btn pri" id="tplNew">Save current scope as template</button>
+      <button class="btn" id="tplFolder">New folder</button>
+      <span style="flex:1"></span>
+      <span class="saved" id="tplStatus">&nbsp;</span>
+    </div>
+    <div class="folders" id="tplFolders"></div>
+    <div class="tplgrid" id="tplGrid"></div>
+  </section>
 
   <section class="pane" id="pane-scope">
     <div class="toolbar">
@@ -895,6 +935,7 @@ function render(){
   $('#tMarginAbs').textContent=c.lines.length?big(c.marginAbs)+' on net revenue':'\u2014';
   $('#cScope').textContent=S.sel.size;
   renderTable(); renderDash(c); renderBridge(c); renderDisc(c); renderQuote(c); renderAudit(c);
+  renderTemplates();
   try{localStorage.setItem(WORK,JSON.stringify(snapshot()));}catch(e){}
 }
 
@@ -956,6 +997,126 @@ const PRESETS={
   'Submission package preparation and journal submission (varies as per journal requirement)',
   'Minor Revisions of Submitted Manuscript and Re-submission (Reviewer comments post submission)',
   "Poster in ppt format (1st draft for Client's review and approval)",'Journal Fee']};
+/* ---------- templates & folders ---------- */
+const TPL_KEY='pricedeskly.templates.v2';
+const tplLoad=()=>{try{const d=JSON.parse(localStorage.getItem(TPL_KEY));
+  return d&&d.items?{folders:d.folders||[],items:d.items}:{folders:[],items:{}};}
+  catch(e){return{folders:[],items:{}};}};
+const tplSave=d=>localStorage.setItem(TPL_KEY,JSON.stringify(d));
+const idsFor=names=>{const set=new Set(names);return TASKS.filter(t=>set.has(t.task)).map(t=>t.id);};
+const BUILTIN=()=>[
+  {id:'bi-rwe',name:'RWE study',folder:'Built-in',builtin:true,sel:idsFor(PRESETS.rwe),fee:22.5},
+  {id:'bi-ph4',name:'Phase 4',folder:'Built-in',builtin:true,sel:idsFor(PRESETS.ph4),fee:22.5},
+  {id:'bi-pub',name:'Publication only',folder:'Built-in',builtin:true,sel:idsFor(PRESETS.pub),fee:22.5}];
+let tplFolder='All';
+
+function tplStats(t){
+  const q=t.q||{},u=t.u||{}; let n=0,cost=0;
+  (t.sel||[]).forEach(id=>{const task=TASKS.find(x=>x.id===id); if(!task)return; n++;
+    const qty=q[id]!==undefined?q[id]:baseQty(task);
+    const uc =u[id]!==undefined?u[id]:task.unit;
+    if(task.kind==='hours')cost+=qty*uc;});
+  return{n,cost};
+}
+function applyTemplate(t){
+  S.sel=new Set(t.sel||[]); S.qty={...(t.q||{})}; S.unit={...(t.u||{})}; S.margin={...(t.g||{})};
+  if(t.fee!==undefined)$('#pFee').value=t.fee;
+  if(!t.builtin){const d=tplLoad(); if(d.items[t.id]){d.items[t.id].used=Date.now(); tplSave(d);}}
+  render(); tplStatus('Loaded "'+t.name+'"');
+}
+function tplStatus(m){const el=$('#tplStatus'); if(!el)return; el.textContent=m;
+  clearTimeout(tplStatus._t); tplStatus._t=setTimeout(()=>{el.innerHTML='&nbsp;';},2600);}
+function allTemplates(){const d=tplLoad();
+  return [...BUILTIN(), ...Object.values(d.items).sort((a,b)=>(b.used||b.created||0)-(a.used||a.created||0))];}
+function folderList(){const d=tplLoad(); const used=new Set(Object.values(d.items).map(t=>t.folder||'Uncategorised'));
+  return [...new Set([...(d.folders||[]),...used])].filter(Boolean).sort();}
+
+function renderTemplates(){
+  const grid=$('#tplGrid'), fol=$('#tplFolders'); if(!grid)return;
+  const all=allTemplates();
+  $('#cTpl').textContent=all.filter(t=>!t.builtin).length;
+  const counts={}; all.forEach(t=>{const f=t.folder||'Uncategorised'; counts[f]=(counts[f]||0)+1;});
+  const folders=['All','Built-in',...folderList().filter(f=>f!=='Built-in')];
+  fol.innerHTML=folders.map(f=>`<button class="fchip" data-f="${f.replace(/"/g,'&quot;')}"
+      aria-pressed="${f===tplFolder}">${f}<span class="n">${f==='All'?all.length:(counts[f]||0)}</span></button>`).join('')
+    +`<button class="fchip" id="tplFolderAdd" title="Create a folder">+ folder</button>`;
+  const shown=all.filter(t=>tplFolder==='All'||(t.folder||'Uncategorised')===tplFolder);
+  if(!shown.length){grid.innerHTML='<div class="empty">No templates in this folder yet. Scope a quote, then use “Save current scope as template”.</div>';return;}
+  const fnames=folderList().filter(f=>f!=='Built-in');
+  grid.innerHTML=shown.map(t=>{
+    const st=tplStats(t);
+    return `<div class="tplcard" data-id="${t.id}" role="button" tabindex="0">
+      <div class="top"><span class="nm">${t.name}</span>
+        <span class="badge ${t.builtin?'bi':''}">${t.builtin?'Built-in':(t.folder||'Uncategorised')}</span></div>
+      <div class="figs">
+        <span class="fig"><span class="lbl">Activities</span><span class="v">${st.n}</span></span>
+        <span class="fig"><span class="lbl">Fixed fee now</span><span class="v">${big(st.cost)}</span></span>
+        <span class="fig"><span class="lbl">Margin</span><span class="v">${(t.fee!==undefined?t.fee:22.5)}%</span></span>
+      </div>
+      ${t.builtin?'':`<div class="acts">
+        <button data-act="rename">Rename</button>
+        <button data-act="update">Update</button>
+        <button data-act="delete">Delete</button>
+        <select data-act="move" aria-label="Move to folder">
+          ${['Uncategorised',...fnames.filter(f=>f!=='Uncategorised')].map(f=>
+            `<option ${((t.folder||'Uncategorised')===f)?'selected':''}>${f}</option>`).join('')}
+        </select></div>`}
+    </div>`;}).join('');
+  // rail quick-apply chips
+  const rail=$('#railTpl');
+  if(rail)rail.innerHTML=all.slice(0,6).map(t=>
+    `<button class="chip" data-tpl="${t.id}" title="${(t.folder||'Uncategorised')}">${t.name}</button>`).join('');
+}
+
+$('#tplFolders').addEventListener('click',e=>{
+  if(e.target.closest('#tplFolderAdd')){newFolder();return;}
+  const b=e.target.closest('.fchip'); if(!b||!b.dataset.f)return;
+  tplFolder=b.dataset.f; renderTemplates();});
+function newFolder(){
+  const n=prompt('Folder name (for example: MM)'); if(!n)return;
+  const d=tplLoad(); const name=n.trim();
+  if(!d.folders.includes(name))d.folders.push(name);
+  tplSave(d); tplFolder=name; renderTemplates(); tplStatus('Folder "'+name+'" created');}
+$('#tplFolder').addEventListener('click',newFolder);
+$('#tplNew').addEventListener('click',()=>{
+  if(!S.sel.size){tplStatus('Scope some activities first');return;}
+  const n=prompt('Template name'); if(!n)return;
+  const fnames=folderList().filter(f=>f!=='Built-in');
+  let folder='Uncategorised';
+  if(fnames.length){const f=prompt('Folder? Existing: '+fnames.join(', ')+'\n(leave blank for Uncategorised)','');
+    if(f&&f.trim())folder=f.trim();}
+  const d=tplLoad(); const id='t'+Date.now().toString(36);
+  d.items[id]={id,name:n.trim(),folder,sel:[...S.sel],q:{...S.qty},u:{...S.unit},g:{...S.margin},
+               fee:+$('#pFee').value,created:Date.now()};
+  if(folder!=='Uncategorised'&&!d.folders.includes(folder))d.folders.push(folder);
+  tplSave(d); tplFolder=folder; renderTemplates(); tplStatus('Saved "'+n.trim()+'"');});
+$('#tplGrid').addEventListener('click',e=>{
+  const card=e.target.closest('.tplcard'); if(!card)return;
+  const t=allTemplates().find(x=>x.id===card.dataset.id); if(!t)return;
+  const act=e.target.closest('[data-act]');
+  if(!act){applyTemplate(t);return;}
+  e.stopPropagation();
+  const d=tplLoad(); const it=d.items[t.id]; if(!it)return;
+  const a=act.dataset.act;
+  if(a==='rename'){const n=prompt('Rename template',it.name); if(!n)return; it.name=n.trim();}
+  else if(a==='update'){it.sel=[...S.sel];it.q={...S.qty};it.u={...S.unit};it.g={...S.margin};
+    it.fee=+$('#pFee').value; tplStatus('Updated "'+it.name+'" from the current scope');}
+  else if(a==='delete'){if(!confirm('Delete template "'+it.name+'"?'))return; delete d.items[t.id];}
+  tplSave(d); renderTemplates();});
+$('#tplGrid').addEventListener('change',e=>{
+  const sel=e.target.closest('select[data-act="move"]'); if(!sel)return;
+  const card=e.target.closest('.tplcard'); const d=tplLoad(); const it=d.items[card.dataset.id];
+  if(!it)return; it.folder=sel.value; tplSave(d); renderTemplates();
+  tplStatus('Moved "'+it.name+'" to '+sel.value);});
+$('#tplGrid').addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  const card=e.target.closest('.tplcard'); if(!card)return; e.preventDefault();
+  const t=allTemplates().find(x=>x.id===card.dataset.id); if(t)applyTemplate(t);});
+$('#railTpl').addEventListener('click',e=>{
+  const b=e.target.closest('[data-tpl]'); if(!b)return;
+  const t=allTemplates().find(x=>x.id===b.dataset.tpl); if(t)applyTemplate(t);});
+$('#railManage').addEventListener('click',()=>{$('.tab[data-pane="tpl"]').click();});
+
 $$('[data-preset]').forEach(b=>b.addEventListener('click',()=>{
   applyPreset(b.dataset.preset); render();}));
 function applyPreset(name){
