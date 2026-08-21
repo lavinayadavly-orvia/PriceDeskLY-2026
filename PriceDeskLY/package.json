@@ -4,8 +4,10 @@
   "version": "1.0.0",
   "description": "Study pricing model for clinical research services",
   "scripts": {
-    "dev": "wrangler pages dev dist",
-    "deploy": "wrangler pages deploy dist --project-name pricedeskly"
+    "dev": "cd .. && wrangler pages dev",
+    "deploy": "cd .. && wrangler pages deploy"
   },
-  "devDependencies": { "wrangler": "^4" }
+  "devDependencies": {
+    "wrangler": "^4"
+  }
 }

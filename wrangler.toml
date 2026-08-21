@@ -1,0 +1,5 @@
+# Cloudflare Pages reads this from the ROOT of the repository.
+# The app lives in a subfolder, so the output dir is qualified from here.
+name = "pricedeskly-2026"
+compatibility_date = "2026-08-21"
+pages_build_output_dir = "PriceDeskLY/dist"
